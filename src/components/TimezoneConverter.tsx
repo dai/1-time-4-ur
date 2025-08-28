@@ -66,10 +66,11 @@ export function TimezoneConverter() {
 
   const getDayDifferenceText = (diff: number) => {
     if (diff === 0) return '';
-    if (diff === 1) return ` (+1 ${t('time.today').toLowerCase() === 'today' ? 'day' : '日'})`;
-    if (diff === -1) return ` (-1 ${t('time.today').toLowerCase() === 'today' ? 'day' : '日'})`;
-    if (diff > 1) return ` (+${diff} ${t('time.today').toLowerCase() === 'today' ? 'days' : '日'})`;
-    return ` (${diff} ${t('time.today').toLowerCase() === 'today' ? 'days' : '日'})`;
+    const isJapanese = t('language.japanese') === '日本語';
+    if (diff === 1) return ` (+1 ${isJapanese ? '日' : 'day'})`;
+    if (diff === -1) return ` (-1 ${isJapanese ? '日' : 'day'})`;
+    if (diff > 1) return ` (+${diff} ${isJapanese ? '日' : 'days'})`;
+    return ` (${diff} ${isJapanese ? '日' : 'days'})`;
   };
 
   return (

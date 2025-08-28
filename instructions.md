@@ -1,296 +1,256 @@
-# Timezone Converter - 開発・メンテナンス指示書
+# タイムゾーンコンバーター - 開発・メンテナンス用ガイド
 
-## 概要
-このプロジェクトは、複数のタイムゾーンでの時刻変換と世界時計表示を行うWebアプリケーションです。React + TypeScript + Tailwind CSSで構築されており、日本語をメイン言語とした多国語対応を行っています。
+## プロジェクト概要
+
+このアプリケーションは、異なるタイムゾーン間での時刻変換と、複数の世界時計表示を行うWebアプリケーションです。React + TypeScript + Vite をベースとし、shadcn/ui コンポーネントライブラリを使用しています。
 
 ## 技術スタック
+
 - **フレームワーク**: React 18 + TypeScript
 - **ビルドツール**: Vite
-- **スタイリング**: Tailwind CSS + shadcn/ui v4 components
-- **アイコン**: Phosphor Icons React
-- **状態管理**: React hooks (useState) + Spark KV storage
-- **多国語化**: React Context + カスタムhooks
+- **スタイリング**: Tailwind CSS
+- **UIコンポーネント**: shadcn/ui v4
+- **アイコン**: Phosphor Icons
+- **多言語対応**: カスタム翻訳システム（日本語/英語）
+- **データ永続化**: GitHub Spark KV ストレージ
 
 ## プロジェクト構造
 
 ```
 src/
-├── App.tsx                 # メインアプリケーションコンポーネント
-├── index.css              # グローバルスタイル・テーマ定義
-├── prd.md                 # プロダクト要件定義書
 ├── components/
-│   ├── TimezoneConverter.tsx  # タイムゾーン変換コンポーネント
-│   ├── WorldClock.tsx         # 世界時計コンポーネント
-│   ├── LanguageSwitcher.tsx   # 言語切り替えコンポーネント
-│   └── ui/                    # shadcn/ui コンポーネント（事前インストール済み）
+│   ├── ui/              # shadcn/ui コンポーネント（自動生成）
+│   ├── LanguageSwitcher.tsx  # 言語切り替えコンポーネント
+│   ├── TimezoneConverter.tsx # タイムゾーン変換コンポーネント
+│   └── WorldClock.tsx   # 世界時計コンポーネント
 ├── contexts/
-│   └── LanguageContext.tsx    # 多国語化コンテキスト
+│   └── LanguageContext.tsx   # 言語切り替えコンテキスト
 ├── hooks/
-│   └── useTranslation.ts      # 翻訳フック
+│   ├── useTranslation.ts     # 翻訳フック
+│   └── use-mobile.ts         # モバイル判定フック
 ├── lib/
-│   ├── utils.ts              # ユーティリティ関数
-│   └── translations.ts       # 翻訳データ
-└── types/
-    └── index.ts              # TypeScript型定義
+│   ├── translations.ts       # 翻訳定義
+│   ├── timezone-utils.ts     # タイムゾーン関連ユーティリティ
+│   └── utils.ts             # 汎用ユーティリティ
+├── types/
+│   └── timezone.ts          # タイムゾーン関連の型定義
+├── App.tsx                  # メインアプリケーション
+├── index.css               # Tailwind CSS設定とテーマ
+└── main.tsx               # エントリーポイント（編集禁止）
 ```
 
-## 開発環境セットアップ
+## 開発環境のセットアップ
 
-### 1. 必要なツール
-- Node.js 18以上
-- VS Code
-- GitHub Copilot (推奨)
+### 1. 依存関係のインストール
 
-### 2. 推奨VS Code拡張機能
-```json
-{
-  "recommendations": [
-    "ms-vscode.vscode-typescript-next",
-    "bradlc.vscode-tailwindcss",
-    "GitHub.copilot",
-    "GitHub.copilot-chat",
-    "esbenp.prettier-vscode",
-    "ms-vscode.vscode-json"
-  ]
-}
+```bash
+npm install
 ```
 
-### 3. 開発サーバー起動
+### 2. 開発サーバーの起動
+
 ```bash
 npm run dev
 ```
 
-## 多国語化システム
+### 3. ビルド
 
-### 言語サポート
-- **プライマリ**: 日本語 (ja)
-- **セカンダリ**: 英語 (en)
-
-### 翻訳の追加・編集
-
-#### 1. 翻訳データの場所
-`src/lib/translations.ts` ファイルに全ての翻訳テキストが格納されています。
-
-#### 2. 新しい翻訳キーの追加
-```typescript
-export const translations = {
-  ja: {
-    // 既存のキー...
-    "new.key": "新しいテキスト",
-    "nested": {
-      "key": "ネストされたテキスト"
-    }
-  },
-  en: {
-    // 既存のキー...
-    "new.key": "New text",
-    "nested": {
-      "key": "Nested text"
-    }
-  }
-}
-```
-
-#### 3. コンポーネントでの使用方法
-```typescript
-import { useTranslation } from '../hooks/useTranslation';
-
-function MyComponent() {
-  const { t } = useTranslation();
-  
-  return (
-    <div>
-      <h1>{t('new.key')}</h1>
-      <p>{t('nested.key')}</p>
-    </div>
-  );
-}
-```
-
-### 新しい言語の追加
-
-#### 1. 翻訳データに言語を追加
-```typescript
-// src/lib/translations.ts
-export const translations = {
-  ja: { /* 日本語翻訳 */ },
-  en: { /* 英語翻訳 */ },
-  ko: { /* 韓国語翻訳 */ }, // 新しい言語
-}
-
-export type Language = 'ja' | 'en' | 'ko'; // 型定義を更新
-```
-
-#### 2. 言語切り替えコンポーネントを更新
-```typescript
-// src/components/LanguageSwitcher.tsx
-const languages = [
-  { code: 'ja' as const, name: '日本語', flag: '🇯🇵' },
-  { code: 'en' as const, name: 'English', flag: '🇺🇸' },
-  { code: 'ko' as const, name: '한국어', flag: '🇰🇷' }, // 新しい言語
-];
-```
-
-## コンポーネント開発ガイドライン
-
-### 1. 新しいコンポーネントの作成
-```typescript
-import React from 'react';
-import { useTranslation } from '../hooks/useTranslation';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-
-export function NewComponent() {
-  const { t } = useTranslation();
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{t('component.title')}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        {/* コンテンツ */}
-      </CardContent>
-    </Card>
-  );
-}
-```
-
-### 2. 状態管理
-- **一時的な状態**: `useState`を使用
-- **永続化が必要な状態**: `useKV`フックを使用
-
-```typescript
-import { useState } from 'react';
-import { useKV } from '@github/spark/hooks';
-
-function Component() {
-  // 一時的な状態（ページリロードで消える）
-  const [inputValue, setInputValue] = useState('');
-  
-  // 永続化される状態（ページリロード後も保持）
-  const [savedTimezones, setSavedTimezones] = useKV('user-timezones', []);
-}
-```
-
-### 3. スタイリングガイドライン
-- Tailwind CSSクラスを使用
-- カスタムCSSは最小限に
-- shadcn/uiコンポーネントを優先的に使用
-- テーマ色は`index.css`で定義された変数を使用
-
-## メンテナンス作業
-
-### 1. 翻訳の更新
-1. `src/lib/translations.ts`を編集
-2. すべての言語で同じキーが存在することを確認
-3. TypeScriptエラーがないことを確認
-
-### 2. 新機能の追加
-1. 必要に応じて翻訳キーを追加
-2. TypeScript型定義を更新
-3. コンポーネントを作成
-4. App.tsxに統合
-
-### 3. デザインの変更
-1. `src/index.css`でテーマ色を調整
-2. Tailwindクラスで個別スタイルを調整
-
-### 4. バグ修正
-1. TypeScriptエラーを最優先で修正
-2. ブラウザコンソールのエラーを確認
-3. 各言語での表示を確認
-
-## デプロイメント
-
-### ビルド
 ```bash
 npm run build
 ```
 
-### プレビュー
-```bash
-npm run preview
+## 主要コンポーネントの説明
+
+### App.tsx
+- メインアプリケーションコンポーネント
+- LanguageProvider でラップして多言語対応を提供
+- ヘッダー、コンバーター、世界時計の配置
+
+### TimezoneConverter.tsx
+- 2つのタイムゾーン間での時刻変換機能
+- 日付・時刻の入力とリアルタイム変換
+- タイムゾーンの入れ替え機能
+
+### WorldClock.tsx
+- 複数のタイムゾーンの時刻を同時表示
+- タイムゾーンの追加・削除機能
+- データは KV ストレージに永続化
+
+### LanguageSwitcher.tsx
+- 日本語/英語の切り替え機能
+- 現在の言語設定を KV ストレージに保存
+
+## 多言語対応システム
+
+### 翻訳の追加・編集
+
+`src/lib/translations.ts` ファイルで翻訳を管理:
+
+```typescript
+export const translations = {
+  ja: {
+    app: {
+      title: 'タイムゾーンコンバーター',
+      description: '...'
+    },
+    // ...
+  },
+  en: {
+    app: {
+      title: 'Timezone Converter',
+      description: '...'
+    },
+    // ...
+  }
+};
 ```
+
+### 翻訳の使用方法
+
+```typescript
+import { useTranslation } from '../hooks/useTranslation';
+
+const { t } = useTranslation();
+const title = t('app.title'); // ネストしたキーをドット記法で指定
+```
+
+### 新しい言語の追加
+
+1. `src/lib/translations.ts` に新しい言語オブジェクトを追加
+2. `src/contexts/LanguageContext.tsx` の Language 型に新しい言語コードを追加
+3. `LanguageSwitcher.tsx` に新しい言語のオプションを追加
+
+## スタイリングとテーマ
+
+### カラーパレット
+- 暖かみのあるサンセット系カラー
+- OKLCH色空間を使用した高品質な色定義
+- アクセシビリティを考慮したコントラスト比
+
+### カスタマイズ方法
+
+`src/index.css` の `:root` セクションでカラー変数を編集:
+
+```css
+:root {
+  --primary: oklch(0.58 0.15 65);     /* メインカラー */
+  --secondary: oklch(0.85 0.08 85);   /* セカンダリカラー */
+  --accent: oklch(0.78 0.12 45);      /* アクセントカラー */
+  /* ... */
+}
+```
+
+## データ永続化
+
+### KV ストレージの使用
+
+```typescript
+import { useKV } from '@github/spark/hooks';
+
+// 永続化が必要なデータ
+const [worldClocks, setWorldClocks] = useKV('world-clocks', []);
+const [language, setLanguage] = useKV('language', 'ja');
+
+// 一時的なデータ（通常のstate）
+const [inputTime, setInputTime] = useState('');
+```
+
+### データの種類
+- **永続化**: 言語設定、追加された世界時計
+- **一時的**: フォーム入力値、UI状態
+
+## タイムゾーン処理
+
+### サポートされているタイムゾーン
+
+`src/lib/timezone-utils.ts` で定義された主要なタイムゾーン:
+- アジア太平洋地域
+- ヨーロッパ・アフリカ地域  
+- 北米・南米地域
+
+### タイムゾーンの追加
+
+```typescript
+// timezone-utils.ts に新しいタイムゾーンを追加
+export const timezones: Timezone[] = [
+  // 既存のタイムゾーン...
+  {
+    id: 'Pacific/Auckland',
+    label: 'Auckland',
+    country: 'New Zealand',
+    offset: '+12:00'
+  },
+];
+```
+
+## よくある作業
+
+### 新しいタイムゾーンの追加
+
+1. `src/lib/timezone-utils.ts` にタイムゾーン定義を追加
+2. 必要に応じて翻訳ファイルに地域名の翻訳を追加
+
+### UIコンポーネントの追加
+
+1. shadcn/ui コンポーネントを使用する場合: `npx shadcn@latest add [component-name]`
+2. カスタムコンポーネント: `src/components/` に作成
+
+### 翻訳の追加
+
+1. `src/lib/translations.ts` に新しいキーと翻訳を追加
+2. コンポーネントで `t('新しいキー')` を使用
+
+### スタイルの調整
+
+1. Tailwind クラスを使用
+2. カスタムスタイルが必要な場合は `src/index.css` に追加
 
 ## トラブルシューティング
 
-### よくある問題
+### 翻訳が表示されない
+- 翻訳キーが正しくネストされているか確認
+- `useTranslation` フックが正しく使用されているか確認
+- LanguageProvider でコンポーネントがラップされているか確認
 
-#### 1. 翻訳が表示されない
-- `translations.ts`にキーが存在するか確認
-- タイポがないか確認
-- デフォルト言語（日本語）に翻訳があるか確認
+### タイムゾーン変換が正しくない
+- ブラウザのタイムゾーンデータベースに依存
+- Intl.DateTimeFormat を使用しているため、最新のブラウザが必要
 
-#### 2. TypeScriptエラー
-- `npm run type-check`でエラー詳細を確認
-- 型定義ファイルを更新
-
-#### 3. スタイルが適用されない
-- Tailwindクラス名のタイポを確認
-- `index.css`のテーマ変数を確認
-
-## GitHub Copilotとの連携
-
-### 効果的なプロンプト例
-
-#### コンポーネント作成
-```
-// 多国語対応のタイムゾーン選択コンポーネントを作成
-// useTranslationフックを使用して翻訳対応
-// shadcn/uiのSelectコンポーネントを使用
-```
-
-#### 翻訳追加
-```
-// 以下のテキストを日本語と英語で翻訳データに追加:
-// "時刻を選択してください", "Select a time"
-```
-
-#### バグ修正
-```
-// このコンポーネントで時刻が正しく変換されない問題を修正
-// 現在のコード: [コードを貼り付け]
-```
+### スタイルが反映されない
+- Tailwind クラス名が正しいか確認
+- カスタムCSS変数が正しく定義されているか確認
 
 ## パフォーマンス最適化
 
-### 1. メモ化
-React.memoやuseMemo, useCallbackを適切に使用
+### 推奨事項
+- 重い計算は useMemo を使用
+- 頻繁に更新される時刻表示は適切な間隔で更新
+- 不要なre-renderを避けるためコンポーネントを細分化
 
-### 2. 翻訳の最適化
-- 不要な翻訳の削除
-- 翻訳キーの統一
+### モニタリング
+- React DevTools でre-renderを監視
+- ネットワークタブでバンドルサイズを確認
 
-### 3. バンドルサイズの確認
-```bash
-npm run build && npx vite-bundle-analyzer dist
-```
+## デプロイメント
 
-## セキュリティ考慮事項
+このアプリケーションは GitHub Spark プラットフォーム用に最適化されており、以下の特徴があります:
 
-### 1. 入力値の検証
-- タイムゾーン名の検証
-- 時刻形式の検証
+- 静的ファイルとしてビルド可能
+- KV ストレージによるデータ永続化
+- ブラウザAPIのみを使用（サーバー依存なし）
 
-### 2. XSS対策
-- React標準のエスケープ機能を活用
-- dangerouslySetInnerHTMLの使用禁止
+## 貢献ガイドライン
 
-## 今後の拡張予定
+### コードスタイル
+- TypeScript を適切に使用
+- コンポーネントは機能ごとに分割
+- 翻訳対応を考慮したテキスト実装
+- アクセシビリティを意識した実装
 
-### 機能追加候補
-- [ ] カスタムタイムゾーンの保存
-- [ ] 会議時間の最適化提案
-- [ ] カレンダー連携
-- [ ] モバイルアプリ対応
-- [ ] 他言語サポート（中国語、韓国語等）
+### コミットメッセージ
+- 日本語または英語で明確に記述
+- 変更内容を簡潔に説明
 
-### 技術的改善
-- [ ] PWA対応
-- [ ] オフライン機能
-- [ ] パフォーマンス最適化
-- [ ] アクセシビリティ向上
+## ライセンス
 
----
-
-このドキュメントは開発・メンテナンス作業の指針として作成されました。質問や追加が必要な情報があれば、適宜更新してください。
+このプロジェクトのライセンス情報については、プロジェクトルートのライセンスファイルを参照してください。

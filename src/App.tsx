@@ -11,7 +11,7 @@ function AppContent() {
   
   // Update document title when language changes
   useEffect(() => {
-    document.title = t('app.title') + ' - 世界の時刻を変換・表示';
+    document.title = t('app.title');
   }, [t]);
   
   return (

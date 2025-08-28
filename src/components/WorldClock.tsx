@@ -101,7 +101,7 @@ export function WorldClock() {
           <div className="text-center py-8 text-muted-foreground">
             <Clock className="h-12 w-12 mx-auto mb-3 opacity-50" />
             <p className="text-sm">{t('worldclock.empty')}</p>
-            <p className="text-xs">{t('worldclock.empty.description')}</p>
+            <p className="text-xs">{t('worldclock.emptyDescription')}</p>
           </div>
         ) : (
           <div className="grid gap-3">
