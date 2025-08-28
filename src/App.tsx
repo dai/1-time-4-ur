@@ -1,8 +1,13 @@
 import { WorldClock } from './components/WorldClock';
 import { TimezoneConverter } from './components/TimezoneConverter';
+import { LanguageSwitcher } from './components/LanguageSwitcher';
+import { LanguageProvider } from './contexts/LanguageContext';
+import { useTranslation } from './hooks/useTranslation';
 import { Globe } from '@phosphor-icons/react';
 
-function App() {
+function AppContent() {
+  const { t } = useTranslation();
+  
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
@@ -12,11 +17,13 @@ function App() {
             <div className="p-2 bg-primary/10 rounded-lg">
               <Globe className="h-8 w-8 text-primary" />
             </div>
-            <h1 className="text-3xl font-bold tracking-tight">Timezone Converter</h1>
+            <h1 className="text-3xl font-bold tracking-tight">{t('app.title')}</h1>
+            <div className="ml-auto">
+              <LanguageSwitcher />
+            </div>
           </div>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Convert times between different timezones and keep track of multiple world clocks. 
-            Perfect for scheduling meetings and coordinating across global teams.
+            {t('app.description')}
           </p>
         </div>
 
@@ -33,10 +40,18 @@ function App() {
 
         {/* Footer */}
         <div className="mt-12 text-center text-sm text-muted-foreground">
-          <p>All times are calculated using your browser's timezone database</p>
+          <p>{t('app.footer')}</p>
         </div>
       </div>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <LanguageProvider>
+      <AppContent />
+    </LanguageProvider>
   );
 }
 

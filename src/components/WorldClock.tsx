@@ -6,6 +6,7 @@ import { X, Plus, Clock } from '@phosphor-icons/react';
 import { TimezoneSelect } from './TimezoneSelect';
 import { formatTime, formatDate, getCurrentOffset, ALL_TIMEZONES } from '@/lib/timezone-utils';
 import { useKV } from '@github/spark/hooks';
+import { useTranslation } from '../hooks/useTranslation';
 
 interface WorldClockZone {
   id: string;
@@ -15,6 +16,7 @@ interface WorldClockZone {
 }
 
 export function WorldClock() {
+  const { t } = useTranslation();
   const [worldClockZones, setWorldClockZones] = useKV<WorldClockZone[]>('world-clock-zones', []);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [showAddZone, setShowAddZone] = useState(false);
@@ -62,7 +64,7 @@ export function WorldClock() {
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <Clock className="h-5 w-5" />
-            World Clock
+            {t('worldclock.title')}
           </CardTitle>
           <Button
             variant="outline"
@@ -71,7 +73,7 @@ export function WorldClock() {
             className="shrink-0"
           >
             <Plus className="h-4 w-4 mr-1" />
-            Add Zone
+            {t('worldclock.add')}
           </Button>
         </div>
       </CardHeader>
@@ -90,7 +92,7 @@ export function WorldClock() {
               disabled={!newTimezone}
               className="px-4"
             >
-              Add
+              {t('common.add')}
             </Button>
           </div>
         )}
@@ -98,8 +100,8 @@ export function WorldClock() {
         {worldClockZones.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
             <Clock className="h-12 w-12 mx-auto mb-3 opacity-50" />
-            <p className="text-sm">No world clocks added yet</p>
-            <p className="text-xs">Add timezones to see multiple clocks at once</p>
+            <p className="text-sm">{t('worldclock.empty')}</p>
+            <p className="text-xs">{t('worldclock.empty.description')}</p>
           </div>
         ) : (
           <div className="grid gap-3">

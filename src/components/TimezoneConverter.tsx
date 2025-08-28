@@ -8,8 +8,10 @@ import { ArrowRight, Calendar, ArrowsClockwise } from '@phosphor-icons/react';
 import { TimezoneSelect } from './TimezoneSelect';
 import { formatTimeWithoutSeconds, convertTime, getCurrentOffset, getUserTimezone } from '@/lib/timezone-utils';
 import { useKV } from '@github/spark/hooks';
+import { useTranslation } from '../hooks/useTranslation';
 
 export function TimezoneConverter() {
+  const { t } = useTranslation();
   const [sourceTimezone, setSourceTimezone] = useKV('converter-source-timezone', getUserTimezone());
   const [targetTimezone, setTargetTimezone] = useKV('converter-target-timezone', 'UTC');
   const [sourceTime, setSourceTime] = useKV('converter-source-time', '12:00');
@@ -64,10 +66,10 @@ export function TimezoneConverter() {
 
   const getDayDifferenceText = (diff: number) => {
     if (diff === 0) return '';
-    if (diff === 1) return ' (+1 day)';
-    if (diff === -1) return ' (-1 day)';
-    if (diff > 1) return ` (+${diff} days)`;
-    return ` (${diff} days)`;
+    if (diff === 1) return ` (+1 ${t('time.today').toLowerCase() === 'today' ? 'day' : '日'})`;
+    if (diff === -1) return ` (-1 ${t('time.today').toLowerCase() === 'today' ? 'day' : '日'})`;
+    if (diff > 1) return ` (+${diff} ${t('time.today').toLowerCase() === 'today' ? 'days' : '日'})`;
+    return ` (${diff} ${t('time.today').toLowerCase() === 'today' ? 'days' : '日'})`;
   };
 
   return (
@@ -75,14 +77,14 @@ export function TimezoneConverter() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <ArrowsClockwise className="h-5 w-5" />
-          Timezone Converter
+          {t('converter.title')}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Source Section */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <Label className="text-base font-medium">From</Label>
+            <Label className="text-base font-medium">{t('converter.from')}</Label>
             <Button
               variant="outline"
               size="sm"
@@ -90,7 +92,7 @@ export function TimezoneConverter() {
               className="text-xs"
             >
               <Calendar className="h-3 w-3 mr-1" />
-              Now
+              {t('time.now')}
             </Button>
           </div>
           
@@ -102,7 +104,7 @@ export function TimezoneConverter() {
           
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
-              <Label htmlFor="source-time" className="text-sm">Time</Label>
+              <Label htmlFor="source-time" className="text-sm">{t('converter.time')}</Label>
               <Input
                 id="source-time"
                 type="time"
@@ -112,7 +114,7 @@ export function TimezoneConverter() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="source-date" className="text-sm">Date</Label>
+              <Label htmlFor="source-date" className="text-sm">{t('converter.date')}</Label>
               <Input
                 id="source-date"
                 type="date"
@@ -146,7 +148,7 @@ export function TimezoneConverter() {
 
         {/* Target Section */}
         <div className="space-y-4">
-          <Label className="text-base font-medium">To</Label>
+          <Label className="text-base font-medium">{t('converter.to')}</Label>
           
           <TimezoneSelect
             value={targetTimezone}
@@ -169,7 +171,7 @@ export function TimezoneConverter() {
           <div className="p-4 bg-accent/20 rounded-lg border-2 border-accent/30">
             <div className="flex items-center gap-2 mb-2">
               <ArrowRight className="h-4 w-4 text-accent" />
-              <span className="text-sm font-medium text-accent">Converted Time</span>
+              <span className="text-sm font-medium text-accent">{t('converter.result')}</span>
             </div>
             <div className="space-y-1">
               <div className="text-2xl font-bold tabular-nums">
