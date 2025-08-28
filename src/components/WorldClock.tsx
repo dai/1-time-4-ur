@@ -84,7 +84,7 @@ export function WorldClock() {
               <TimezoneSelect
                 value={newTimezone}
                 onValueChange={setNewTimezone}
-                placeholder="Select timezone to add"
+                placeholder={t('worldclock.add')}
               />
             </div>
             <Button 

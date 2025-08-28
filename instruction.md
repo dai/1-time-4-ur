@@ -1,311 +1,184 @@
-# Timezone Converter - 保守・開発ガイド
+# タイムゾーンコンバーター - メンテナンス用ガイド
 
-## プロジェクト概要
+## 概要
 
-このプロジェクトは、複数のタイムゾーン間で時刻を変換し、世界各地の現在時刻を同時に表示するWebアプリケーションです。React + TypeScript + Tailwind CSSで構築されており、日本語をメイン言語とした多言語対応を実装しています。
-
-## 技術スタック
-
-- **フレームワーク**: React 18 + TypeScript
-- **ビルドツール**: Vite
-- **スタイリング**: Tailwind CSS + shadcn/ui v4
-- **状態管理**: React Context + useKV (永続化)
-- **アイコン**: Phosphor Icons
-- **フォント**: Google Fonts (Roboto, Lora, Source Code Pro)
+このプロジェクトは、異なるタイムゾーン間での時刻変換と複数の世界時計を表示するWebアプリケーションです。React + TypeScript + Tailwind CSSで構築されており、日本語と英語の多言語対応をしています。
 
 ## プロジェクト構造
 
 ```
 src/
 ├── components/           # Reactコンポーネント
-│   ├── ui/              # shadcn/ui コンポーネント (事前インストール済み)
-│   ├── WorldClock.tsx   # 世界時計コンポーネント
-│   ├── TimezoneConverter.tsx # タイムゾーン変換コンポーネント
-│   └── LanguageSwitcher.tsx  # 言語切り替えコンポーネント
-├── contexts/            # React Context
-│   └── LanguageContext.tsx  # 言語状態管理
+│   ├── ui/              # shadcnコンポーネント（編集不要）
+│   ├── LanguageSwitcher.tsx   # 言語切り替えボタン
+│   ├── TimezoneConverter.tsx  # タイムゾーン変換機能
+│   ├── TimezoneSelect.tsx     # タイムゾーン選択コンポーネント
+│   └── WorldClock.tsx         # 世界時計表示
+├── contexts/            # Reactコンテキスト
+│   └── LanguageContext.tsx    # 言語状態管理
 ├── hooks/               # カスタムフック
-│   └── useTranslation.tsx   # 翻訳フック
-├── translations/        # 翻訳ファイル
-│   ├── ja.ts           # 日本語 (メイン言語)
-│   └── en.ts           # 英語
+│   ├── useTranslation.ts      # 翻訳機能
+│   └── use-mobile.ts          # モバイル検出
 ├── lib/                 # ユーティリティ
-│   └── utils.ts        # shadcn/ui ヘルパー
-├── assets/             # 静的ファイル
-├── App.tsx             # メインアプリケーション
-├── index.css           # グローバルスタイル
-├── main.tsx            # エントリーポイント (編集禁止)
-└── prd.md             # 製品要求仕様書
+│   ├── translations.ts        # 翻訳文言
+│   ├── timezone-utils.ts      # タイムゾーン処理
+│   └── utils.ts               # 汎用ユーティリティ
+├── App.tsx              # メインアプリケーション
+├── index.css            # グローバルスタイル
+└── main.tsx             # エントリーポイント（編集禁止）
 ```
 
-## VS Code + Copilot での開発
+## 主要機能
 
-### 推奨拡張機能
+### 1. タイムゾーン変換
+- 任意の日時を異なるタイムゾーン間で変換
+- 現在時刻の設定機能
+- タイムゾーン間での日付差表示
 
-1. **必須**:
-   - ES7+ React/Redux/React-Native snippets
-   - TypeScript Importer
-   - Tailwind CSS IntelliSense
-   - GitHub Copilot
-   - GitHub Copilot Chat
+### 2. 世界時計
+- 複数のタイムゾーンを同時表示
+- リアルタイム時刻更新
+- タイムゾーンの追加・削除
 
-2. **推奨**:
-   - Auto Rename Tag
-   - Bracket Pair Colorizer
-   - GitLens
-   - Japanese Language Pack for Visual Studio Code
+### 3. 多言語対応
+- 日本語（デフォルト）
+- 英語
+- 設定は永続化される
 
-### Copilot活用のコツ
+## 開発環境
 
-#### コンポーネント作成
-```typescript
-// Copilotプロンプト例:
-// "Create a React component for displaying timezone selection with shadcn Select component"
-// "日本語対応のタイムゾーン選択コンポーネントを作成"
+### 必要な環境
+- Node.js 18以上
+- npm または yarn
 
-// 期待される出力形式
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-```
-
-#### 翻訳追加
-```typescript
-// Copilotプロンプト例:
-// "Add Japanese translations for new timezone features"
-// "新しい機能のための日本語翻訳を追加"
-
-// translations/ja.ts に追加
-export const ja = {
-  // 既存の翻訳...
-  newFeature: {
-    title: "新機能",
-    description: "説明文"
-  }
-};
-```
-
-## 多言語対応の開発ガイド
-
-### 1. 新しい翻訳キーの追加
-
-**手順**:
-1. `src/translations/ja.ts` に日本語翻訳を追加（メイン言語）
-2. `src/translations/en.ts` に英語翻訳を追加
-3. コンポーネントで `useTranslation` フックを使用
-
-**例**:
-```typescript
-// translations/ja.ts
-export const ja = {
-  // ...既存の翻訳
-  newSection: {
-    title: "新しいセクション",
-    button: "実行する",
-    message: "処理が完了しました"
-  }
-};
-
-// translations/en.ts  
-export const en = {
-  // ...existing translations
-  newSection: {
-    title: "New Section", 
-    button: "Execute",
-    message: "Process completed"
-  }
-};
-
-// コンポーネントでの使用
-import { useTranslation } from '@/hooks/useTranslation';
-
-function NewComponent() {
-  const { t } = useTranslation();
-  
-  return (
-    <div>
-      <h2>{t('newSection.title')}</h2>
-      <button>{t('newSection.button')}</button>
-      <p>{t('newSection.message')}</p>
-    </div>
-  );
-}
-```
-
-### 2. 新しい言語の追加
-
-**手順**:
-1. `src/translations/` に新しい言語ファイルを作成（例: `zh.ts`）
-2. `src/contexts/LanguageContext.tsx` の `translations` オブジェクトに追加
-3. `supportedLanguages` 配列に言語情報を追加
-
-### 3. 翻訳のベストプラクティス
-
-- **階層構造**: 関連する翻訳は論理的にグループ化
-- **一貫性**: 同じ概念には同じ用語を使用
-- **コンテキスト**: 翻訳キー名にコンテキストを含める
-- **プレースホルダー**: 動的な値には `{value}` 形式を使用
-
-## データ永続化
-
-### useKVフックの使用
-
-```typescript
-import { useKV } from '@github/spark/hooks';
-
-// ユーザー設定の永続化
-const [language, setLanguage] = useKV("user-language", "ja");
-const [savedTimezones, setSavedTimezones] = useKV("saved-timezones", []);
-
-// 関数型更新（推奨）
-setSavedTimezones(current => [...current, newTimezone]);
-
-// 削除
-setSavedTimezones(current => current.filter(tz => tz.id !== targetId));
-```
-
-### 一時的な状態
-
-```typescript
-import { useState } from 'react';
-
-// ページリフレッシュで消える状態
-const [inputValue, setInputValue] = useState("");
-const [isLoading, setIsLoading] = useState(false);
-```
-
-## shadcn/ui コンポーネント
-
-### よく使用するコンポーネント
-
-```typescript
-// ボタン
-import { Button } from "@/components/ui/button";
-<Button variant="default">クリック</Button>
-
-// カード
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-// セレクトボックス
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
-// インプット
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-```
-
-### カスタマイズ
-
-既存のshadcn/uiコンポーネントを変更する場合は、Tailwindクラスでオーバーライド:
-
-```typescript
-<Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
-  カスタムボタン
-</Button>
-```
-
-## スタイリング
-
-### Tailwind CSS
-
-- **レスポンシブ**: `sm:`, `md:`, `lg:`, `xl:` プレフィックス
-- **テーマカラー**: `bg-primary`, `text-foreground`, `border-border` など
-- **スペーシング**: `p-4`, `m-2`, `gap-6` など
-
-### カスタムCSS変数
-
-`src/index.css` でテーマカラーを調整:
-
-```css
-:root {
-  --primary: oklch(0.58 0.15 65);
-  --background: oklch(0.97 0.02 75);
-  /* その他のカラー変数 */
-}
-```
-
-## デバッグとテスト
-
-### よくある問題
-
-1. **翻訳が表示されない**
-   - 翻訳キーが両言語ファイルに存在するか確認
-   - typoがないか確認
-
-2. **状態が保存されない**
-   - `useKV` を使用しているか確認
-   - キー名が一意であるか確認
-
-3. **レイアウトが崩れる**
-   - Tailwindクラスの競合を確認
-   - レスポンシブブレークポイントを確認
-
-### デバッグコマンド
-
+### セットアップ
 ```bash
+# 依存関係のインストール
+npm install
+
 # 開発サーバー起動
 npm run dev
 
 # ビルド
 npm run build
 
-# プロダクションプレビュー
+# プレビュー
 npm run preview
-
-# 型チェック
-npx tsc --noEmit
 ```
 
-## パフォーマンス最適化
+## ファイル編集ガイド
 
-### 画像とアセット
+### 翻訳の追加・修正
+
+翻訳文言は `src/lib/translations.ts` で管理されています。
 
 ```typescript
-// 正しい画像インポート
-import myImage from '@/assets/images/logo.png';
-<img src={myImage} alt="ロゴ" />
-
-// 間違い - 文字列パスは使用しない
-<img src="@/assets/images/logo.png" alt="ロゴ" />
+export const translations = {
+  ja: {
+    'app.title': 'タイムゾーンコンバーター',
+    // 新しい翻訳を追加
+    'new.key': '新しい文言',
+  },
+  en: {
+    'app.title': 'Timezone Converter', 
+    // 対応する英語翻訳を追加
+    'new.key': 'New text',
+  },
+};
 ```
 
-### コンポーネント最適化
+**使用方法:**
+```typescript
+const { t } = useTranslation();
+const text = t('new.key'); // 現在の言語に応じた文言を取得
+```
 
-- `useMemo` でexpensiveな計算をメモ化
-- `useCallback` でイベントハンドラーをメモ化
-- 大きなリストには仮想化を検討
+### 新しいタイムゾーンの追加
 
-## デプロイメント
+`src/lib/timezone-utils.ts`の`COMMON_TIMEZONES`配列に追加できます。
 
-このプロジェクトはGitHub Sparkプラットフォーム上で動作します。変更をコミットすると自動的にデプロイされます。
+```typescript
+export const COMMON_TIMEZONES: Timezone[] = [
+  {
+    value: 'Asia/Tokyo',
+    label: 'GMT+9 (Asia/Tokyo)',
+    city: 'Tokyo',
+    country: 'Japan',
+  },
+  // 新しいタイムゾーンを追加
+];
+```
 
-### 本番環境での注意点
+### コンポーネントの修正
 
-- すべての翻訳が完備されているか確認
-- 適切なエラーハンドリングが実装されているか確認
-- パフォーマンステストを実行
+各コンポーネントはモジュール化されており、独立して編集できます：
 
-## 今後の開発課題
+- **TimezoneConverter.tsx**: 変換機能の修正
+- **WorldClock.tsx**: 世界時計の修正
+- **TimezoneSelect.tsx**: タイムゾーン選択UIの修正
+- **LanguageSwitcher.tsx**: 言語切り替えUIの修正
 
-### 優先度: 高
-- [ ] より多くのタイムゾーンの追加
-- [ ] カスタムタイムゾーンセットの保存機能
-- [ ] 会議時間の最適化提案機能
+### スタイルの修正
 
-### 優先度: 中
-- [ ] ダークモード対応
-- [ ] 他言語（中国語、韓国語）の追加
-- [ ] PWA対応（オフライン機能）
+`src/index.css`でテーマカラーを調整できます：
 
-### 優先度: 低
-- [ ] タイムゾーンの検索機能
-- [ ] 時刻の音声読み上げ
-- [ ] カレンダー連携
+```css
+:root {
+  --primary: oklch(0.58 0.15 65);    /* メインカラー */
+  --secondary: oklch(0.85 0.08 85);  /* サブカラー */
+  --accent: oklch(0.78 0.12 45);     /* アクセントカラー */
+  /* その他のカラー設定 */
+}
+```
 
-## 連絡先とサポート
+## データの永続化
 
-開発に関する質問やイシューがある場合は、GitHub Issueを作成してください。
+アプリケーションでは以下のデータが永続化されます：
 
----
+- 選択された言語設定
+- タイムゾーン変換の設定（元・先タイムゾーン、日時）
+- 世界時計に追加されたタイムゾーン
 
-**最終更新**: 2024年12月
-**バージョン**: 1.0.0
-**メンテナー**: GitHub Spark Team
+これらは`useKV`フックを使用してブラウザのストレージに保存されます。
+
+## トラブルシューティング
+
+### 翻訳が表示されない
+1. `src/lib/translations.ts`で該当のキーが定義されているか確認
+2. `useTranslation`フックが正しくインポートされているか確認
+3. `LanguageProvider`でコンポーネントがラップされているか確認
+
+### タイムゾーンが正しく表示されない
+1. ブラウザのタイムゾーンサポートを確認
+2. `timezone-utils.ts`の`ALL_TIMEZONES`配列で該当タイムゾーンが定義されているか確認
+
+### スタイルが適用されない
+1. Tailwind CSSのクラス名が正しいか確認
+2. カスタムCSSが`index.css`に正しく定義されているか確認
+
+## 使用技術
+
+- **React 18**: UIライブラリ
+- **TypeScript**: 型安全性
+- **Tailwind CSS**: ユーティリティファーストCSS
+- **shadcn/ui**: UIコンポーネントライブラリ
+- **Phosphor Icons**: アイコンライブラリ
+- **Vite**: ビルドツール
+
+## 注意事項
+
+1. `src/main.tsx`は編集しないでください（システムファイル）
+2. shadcnのUIコンポーネント（`src/components/ui/`）は基本的に編集不要
+3. 新しい依存関係を追加する場合は、ブラウザ互換性を確認してください
+4. 翻訳キーを追加する場合は、日本語・英語両方を必ず定義してください
+
+## ライセンス
+
+このプロジェクトはMITライセンスの下で公開されています。
+
+## 更新履歴
+
+- v1.0.0: 初期リリース
+  - タイムゾーン変換機能
+  - 世界時計機能
+  - 日本語・英語多言語対応

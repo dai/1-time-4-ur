@@ -4,21 +4,30 @@ import { LanguageSwitcher } from './components/LanguageSwitcher';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { useTranslation } from './hooks/useTranslation';
 import { Globe } from '@phosphor-icons/react';
+import { useEffect } from 'react';
 
 function AppContent() {
   const { t } = useTranslation();
+  
+  // Update document title when language changes
+  useEffect(() => {
+    document.title = t('app.title') + ' - 世界の時刻を変換・表示';
+  }, [t]);
   
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-3 mb-3">
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <Globe className="h-8 w-8 text-primary" />
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex-1" />
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <Globe className="h-8 w-8 text-primary" />
+              </div>
+              <h1 className="text-3xl font-bold tracking-tight">{t('app.title')}</h1>
             </div>
-            <h1 className="text-3xl font-bold tracking-tight">{t('app.title')}</h1>
-            <div className="ml-auto">
+            <div className="flex-1 flex justify-end">
               <LanguageSwitcher />
             </div>
           </div>

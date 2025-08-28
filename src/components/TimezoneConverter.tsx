@@ -99,7 +99,7 @@ export function TimezoneConverter() {
           <TimezoneSelect
             value={sourceTimezone}
             onValueChange={setSourceTimezone}
-            placeholder="Select source timezone"
+            placeholder={t('converter.from')}
           />
           
           <div className="grid grid-cols-2 gap-3">
@@ -129,7 +129,7 @@ export function TimezoneConverter() {
               <Badge variant="outline" className="text-xs">
                 {getCurrentOffset(sourceTimezone)}
               </Badge>
-              <span>UTC offset</span>
+              <span>UTC {t('language.japanese') === '日本語' ? 'オフセット' : 'offset'}</span>
             </div>
           )}
         </div>
@@ -153,7 +153,7 @@ export function TimezoneConverter() {
           <TimezoneSelect
             value={targetTimezone}
             onValueChange={setTargetTimezone}
-            placeholder="Select target timezone"
+            placeholder={t('converter.to')}
           />
           
           {targetTimezone && (
@@ -161,7 +161,7 @@ export function TimezoneConverter() {
               <Badge variant="outline" className="text-xs">
                 {getCurrentOffset(targetTimezone)}
               </Badge>
-              <span>UTC offset</span>
+              <span>UTC {t('language.japanese') === '日本語' ? 'オフセット' : 'offset'}</span>
             </div>
           )}
         </div>
