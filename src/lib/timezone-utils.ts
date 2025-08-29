@@ -81,12 +81,19 @@ export function formatDate(date: Date, timezone: string): string {
 
 export function getCurrentOffset(timezone: string): string {
   const now = new Date();
-  const utc = new Date(now.getTime() + (now.getTimezoneOffset() * 60000));
-  const targetTime = new Date(utc.toLocaleString('en-US', { timeZone: timezone }));
-  const diff = targetTime.getTime() - utc.getTime();
-  const hours = Math.floor(Math.abs(diff) / (1000 * 60 * 60));
-  const minutes = Math.floor((Math.abs(diff) % (1000 * 60 * 60)) / (1000 * 60));
-  const sign = diff >= 0 ? '+' : '-';
+  
+  // Create a date formatter for the target timezone
+  const targetTime = new Date(now.toLocaleString('en-US', { timeZone: timezone }));
+  const utcTime = new Date(now.toLocaleString('en-US', { timeZone: 'UTC' }));
+  
+  // Calculate the difference in milliseconds
+  const diffMs = targetTime.getTime() - utcTime.getTime();
+  
+  // Convert to minutes and then to hours and minutes
+  const diffMinutes = Math.round(diffMs / (1000 * 60));
+  const hours = Math.floor(Math.abs(diffMinutes) / 60);
+  const minutes = Math.abs(diffMinutes) % 60;
+  const sign = diffMinutes >= 0 ? '+' : '-';
   
   return `${sign}${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
 }
