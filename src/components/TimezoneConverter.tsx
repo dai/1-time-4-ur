@@ -66,10 +66,11 @@ export function TimezoneConverter() {
 
   const getDayDifferenceText = (diff: number) => {
     if (diff === 0) return '';
-    if (diff === 1) return ` (+1 ${t('time.today').toLowerCase() === 'today' ? 'day' : '日'})`;
-    if (diff === -1) return ` (-1 ${t('time.today').toLowerCase() === 'today' ? 'day' : '日'})`;
-    if (diff > 1) return ` (+${diff} ${t('time.today').toLowerCase() === 'today' ? 'days' : '日'})`;
-    return ` (${diff} ${t('time.today').toLowerCase() === 'today' ? 'days' : '日'})`;
+    const isJapanese = t('language.japanese') === '日本語';
+    if (diff === 1) return ` (+1 ${isJapanese ? '日' : 'day'})`;
+    if (diff === -1) return ` (-1 ${isJapanese ? '日' : 'day'})`;
+    if (diff > 1) return ` (+${diff} ${isJapanese ? '日' : 'days'})`;
+    return ` (${diff} ${isJapanese ? '日' : 'days'})`;
   };
 
   return (
@@ -99,7 +100,7 @@ export function TimezoneConverter() {
           <TimezoneSelect
             value={sourceTimezone}
             onValueChange={setSourceTimezone}
-            placeholder="Select source timezone"
+            placeholder={t('converter.from')}
           />
           
           <div className="grid grid-cols-2 gap-3">
@@ -129,7 +130,7 @@ export function TimezoneConverter() {
               <Badge variant="outline" className="text-xs">
                 {getCurrentOffset(sourceTimezone)}
               </Badge>
-              <span>UTC offset</span>
+              <span>UTC {t('language.japanese') === '日本語' ? 'オフセット' : 'offset'}</span>
             </div>
           )}
         </div>
@@ -153,7 +154,7 @@ export function TimezoneConverter() {
           <TimezoneSelect
             value={targetTimezone}
             onValueChange={setTargetTimezone}
-            placeholder="Select target timezone"
+            placeholder={t('converter.to')}
           />
           
           {targetTimezone && (
@@ -161,7 +162,7 @@ export function TimezoneConverter() {
               <Badge variant="outline" className="text-xs">
                 {getCurrentOffset(targetTimezone)}
               </Badge>
-              <span>UTC offset</span>
+              <span>UTC {t('language.japanese') === '日本語' ? 'オフセット' : 'offset'}</span>
             </div>
           )}
         </div>
