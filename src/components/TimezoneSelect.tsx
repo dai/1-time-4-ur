@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { ChevronDown, Globe, Search } from '@phosphor-icons/react';
 import { Timezone, COMMON_TIMEZONES, searchTimezones, getCurrentOffset } from '@/lib/timezone-utils';
 import { cn } from '@/lib/utils';
+import { useTranslation } from '../hooks/useTranslation';
 
 interface TimezoneSelectProps {
   value: string;
@@ -13,10 +14,13 @@ interface TimezoneSelectProps {
   placeholder?: string;
 }
 
-export function TimezoneSelect({ value, onValueChange, placeholder = "Select timezone" }: TimezoneSelectProps) {
+export function TimezoneSelect({ value, onValueChange, placeholder }: TimezoneSelectProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [filteredTimezones, setFilteredTimezones] = useState<Timezone[]>(COMMON_TIMEZONES);
+
+  const defaultPlaceholder = placeholder || t('common.select');
 
   const selectedTimezone = COMMON_TIMEZONES.find(tz => tz.value === value) || 
     searchTimezones('').find(tz => tz.value === value);
@@ -54,7 +58,7 @@ export function TimezoneSelect({ value, onValueChange, placeholder = "Select tim
           ) : (
             <div className="flex items-center gap-3">
               <Globe className="h-4 w-4 text-muted-foreground" />
-              <span className="text-muted-foreground">{placeholder}</span>
+              <span className="text-muted-foreground">{defaultPlaceholder}</span>
             </div>
           )}
           <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -65,7 +69,7 @@ export function TimezoneSelect({ value, onValueChange, placeholder = "Select tim
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search cities or timezones..."
+              placeholder={t('common.search')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-10"
@@ -76,7 +80,9 @@ export function TimezoneSelect({ value, onValueChange, placeholder = "Select tim
         <div className="max-h-60 overflow-y-auto">
           {!search && (
             <div className="p-3 border-b bg-muted/30">
-              <h4 className="text-sm font-medium text-muted-foreground mb-2">Common Timezones</h4>
+              <h4 className="text-sm font-medium text-muted-foreground mb-2">
+                {t('language.japanese') === '日本語' ? '主要なタイムゾーン' : 'Common Timezones'}
+              </h4>
               <div className="flex flex-wrap gap-1">
                 {COMMON_TIMEZONES.slice(0, 6).map((tz) => (
                   <Badge
@@ -98,7 +104,7 @@ export function TimezoneSelect({ value, onValueChange, placeholder = "Select tim
           <div className="p-1">
             {filteredTimezones.length === 0 ? (
               <div className="p-4 text-center text-sm text-muted-foreground">
-                No timezones found
+                {t('language.japanese') === '日本語' ? 'タイムゾーンが見つかりません' : 'No timezones found'}
               </div>
             ) : (
               filteredTimezones.map((timezone) => (
